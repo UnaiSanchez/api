@@ -1,0 +1,63 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bare-css@2.0.3/css/bare.min.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <img id="cat-image" style="width:600px; height:500px; object-fit: cover; ">
+    <br/>
+    <form id='search'>
+        <button primary round type="submit">mas</button>
+        <h3 id='texto'></h3>
+    </form>
+    <div id="div1"></div>
+    <script>
+        const searchForm = document.querySelector('#search')
+        searchForm.addEventListener('submit', function (event) {
+            event.preventDefault()
+            fact()
+            //foto()
+        })
+        function foto() {
+            fetch('https://api.thecatapi.com/v1/images/search')
+                .then(function (response) {
+                    return response.json()
+                })
+                .then(function (data) {
+                    console.log(data)
+                    const cat = data[0]
+                    const img = document.querySelector('#cat-image')
+                    img.src = cat.url
+                })
+        }
+        function fact(){
+            fetch('http://www.catfact.info/api/v1/facts.json?page=:page&per_page=:per_page')
+                .then(function (response) {
+                    return response.json()
+                })
+                .then(function (data) {
+                    let rand=Math.floor((Math.random() * 25) + 1);
+                    allFacts=data['facts']
+                    factRandom=allFacts[rand]
+                    factText=factRandom['details']
+                    //console.log(data)
+                    //console.log(factText)
+                    console.log(factText)
+                    var newDiv = document.createElement("div"); 
+                    var newContent = document.createTextNode(factText); 
+                    newDiv.appendChild(newContent); //añade texto al div creado. 
+
+                    // añade el elemento creado y su contenido al DOM 
+                    var currentDiv = document.getElementById("div1"); 
+                    document.body.insertBefore(newDiv, currentDiv); 
+                })
+        }
+    </script>
+</body>
+
+</html>
