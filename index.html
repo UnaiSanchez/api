@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>Crea un dispositivo</h1>
-    <form col= "1/4" action="http://plataformaiot1.herokuapp.com/create-device" method="POST">
+    <form col= "1/4" action="http://plataformaiot1.herokuapp.com/create-device" method="POST"> <!-- http://plataformaiot1.herokuapp.com-->
         <label for="name">Nobre</label>
         <br/>
         <input type="text" placeholder="Device name" name="name">
@@ -46,8 +46,15 @@
         <label for="device-id">ID</label>
         <input type="text" name='device-id-save' id="device-id-update" placeholder="Device ID" required minlength="24" maxlength="24">
         <label>status</label>  
-        <input type="number" name="value" id ="status-update" placeholder="25" required>
+        <input type="color" name="value" id ="status-update" style='height:50px' required>
         <button type="submit">Guardar</button>
+    </form>
+    <form col="1/4" id='send-email'>
+        <label>ID</label>
+        <input type="text" id="device-id-email" placeholder="Device ID" required minlength="24" maxlength="24">
+        <button type="submit">enviar</button>
+
+        
     </form>
 </body>
 <script>
@@ -70,8 +77,30 @@
 
 
 
+    const email = document.querySelector('#send-email')
+    email.addEventListener('submit',function(event){
+        event.preventDefault()
+        const deviceId = document.querySelector('#device-id-email').value
+        const requestBody = {
+            deviceId : deviceId
+        }
+        const jsonBody = JSON.stringify(requestBody)
+        fetch('http://plataformaiot1.herokuapp.com/send-email',{
+            method: 'POST',
+            body:jsonBody,
+            headers:{
+                'Content-Type':'application/json'
+            }
+        })
+        .then(function(response){
+            return response.json()
+        })
+        .then(function(data){
+            console.log(data)
+        })
 
-    fetch('http://localhost:3001/devices',{})
+    })
+    fetch('http://plataformaiot1.herokuapp.com/devices',{})
     .then(function (response){
         return response.json()
     })
@@ -92,7 +121,7 @@
         //console.log('Formulario evitado')
         const deviceId = document.querySelector('#device_id').value
 
-        fetch('http://localhost:3001/device?id='+ deviceId)
+        fetch('http://plataformaiot1.herokuapp.com/device?id='+ deviceId)
             .then(function(response){
                 return response.json()
             })
@@ -108,7 +137,7 @@
                 deviceInfo.textContent= 'no existe'
             })
     
-        fetch('http://localhost:3001/get-data?id=' + deviceId)
+        fetch('http://plataformaiot1.herokuapp.com/get-data?id=' + deviceId)
         .then(function(response){
             return response.json()
         })
@@ -126,7 +155,7 @@
             value:value
         }
         const jsonData = JSON.stringify(requestData)
-        fetch('http://localhost:3001/save-data',{
+        fetch('http://plataformaiot1.herokuapp.com/save-data',{
             method:'POST',
             body: jsonData,
             headers:{
@@ -143,13 +172,13 @@
     updateForm.addEventListener('submit',function(event){
         event.preventDefault()
         const deviceId =document.querySelector('#device-id-update').value
-        const newStatus =document.querySelector('#status-update').value
+        const newStatus =convertHex(document.querySelector('#status-update').value)
         const requestData={
             deviceId:deviceId,
             status:newStatus
         }
         const jsonData=JSON.stringify(requestData)
-        fetch('http://localhost:3001/update-device',{
+        fetch('http://plataformaiot1.herokuapp.com/update-device',{
             method:'POST',
             body: jsonData,
             headers: {
@@ -163,7 +192,37 @@
             console.log(data)
         })
     })
+    function convertHex(hex) {
+			hex = hex.replace('#', '');
+			r = parseInt(hex.substring(0, 2), 16);
+			g = parseInt(hex.substring(2, 4), 16);
+			b = parseInt(hex.substring(4, 6), 16);
 
+			if (r == 0) {
+				r = '000';
+			} else if (r < 10) {
+				r = '00' + r;
+			} else if (r < 100) {
+				r = '0' + r;
+			}
+			if (g == 0) {
+				g = '000';
+			} else if (g < 10) {
+				g = '00' + g;
+			} else if (g < 100) {
+				g = '0' + g;
+			}
+			if (b == 0) {
+				b = '000';
+			} else if (b < 10) {
+				b = '00' + b;
+			} else if (b < 100) {
+				b = '0' + b;
+			}
+
+			result = parseInt(1 + '' + r + '' + g + '' + '' + b);
+			return result;
+		}
 
 
 
